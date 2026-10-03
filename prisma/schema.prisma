@@ -1,0 +1,20 @@
+// Schema Prisma — Operação Pipa (consulta de placas)
+// Banco: MySQL (tabela `caminhoes` já existente conforme ddl.sql)
+// A URL de conexão fica em prisma.config.ts (padrão Prisma 7).
+
+datasource db {
+  provider = "mysql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Caminhao {
+  id            Int    @id @default(autoincrement())
+  placa         String @unique @db.VarChar(7)
+  nome_condutor String @db.VarChar(255)
+  municipio_uf  String @db.VarChar(255)
+
+  @@map("caminhoes")
+}
