@@ -1,5 +1,5 @@
 // Schema Prisma — Operação Pipa (consulta de placas)
-// Banco: MySQL (tabela `caminhoes` já existente conforme ddl.sql)
+// Banco: MySQL (tabela `caminhoes` já existente, DDL em src/infra/db/ddl.sql)
 // A URL de conexão fica em prisma.config.ts (padrão Prisma 7).
 
 datasource db {
