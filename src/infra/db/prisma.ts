@@ -1,30 +1,25 @@
+// src/infra/db/prisma.ts
+// Client gerado em node_modules (generator prisma-client-js sem output custom).
 import { PrismaClient } from "@prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
-// Prisma 7 exige driver adapter explícito. Para MySQL usamos o driver
-// mariadb (compatível com MySQL 8 / Railway), que recebe um PoolConfig
-// (host, porta, usuário, senha, banco) — e não uma connection string.
-const criarPrisma = () => {
-  const url = new URL(process.env.DATABASE_URL ?? "");
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-  return new PrismaClient({
-    adapter: new PrismaMariaDb({
-      host: url.hostname,
-      port: Number(url.port || 3306),
-      user: decodeURIComponent(url.username),
-      password: decodeURIComponent(url.password),
-      database: url.pathname.replace("/", ""),
-      connectionLimit: 5,
-    }),
-  });
-};
+export function getPrisma() {
+  if (!globalForPrisma.prisma) {
+    const raw = process.env.DATABASE_URL;
+    if (!raw) throw new Error("DATABASE_URL não definida");
 
-// Singleton de PrismaClient: em dev o Next.js recarrega o módulo a cada
-// request e, sem isso, cada reload abriria uma nova conexão com o banco.
-const globalComPrisma = globalThis as unknown as { prisma?: PrismaClient };
+    const u = new URL(raw);
+    const adapter = new PrismaMariaDb({
+      host: u.hostname,
+      port: Number(u.port || 3306),
+      user: decodeURIComponent(u.username),
+      password: decodeURIComponent(u.password),
+      database: u.pathname.slice(1),
+    });
 
-export const prisma = globalComPrisma.prisma ?? criarPrisma();
-
-if (process.env.NODE_ENV !== "production") {
-  globalComPrisma.prisma = prisma;
+    globalForPrisma.prisma = new PrismaClient({ adapter });
+  }
+  return globalForPrisma.prisma;
 }

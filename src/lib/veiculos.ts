@@ -1,4 +1,4 @@
-import { prisma } from "@/infra/db/prisma";
+import { getPrisma } from "@/infra/db/prisma";
 
 export type Veiculo = {
   placa: string;
@@ -43,7 +43,7 @@ export async function consultarPlaca(placa: string): Promise<Veiculo | null> {
   const alvo = normalizarPlaca(placa);
   if (!alvo) return null;
 
-  const registro = await prisma.caminhao.findFirst({
+  const registro = await getPrisma().caminhao.findFirst({
     where: { placa: alvo }, // collations _ci do MySQL já são case-insensitive
     select: {
       placa: true,
@@ -66,7 +66,7 @@ export async function listarVeiculos(filtro: FiltroVeiculos): Promise<Veiculo[]>
   if (filtro.lote) where.lote = filtro.lote;
   if (filtro.municipio) where.municipio_uf = { contains: filtro.municipio };
 
-  const registros = await prisma.caminhao.findMany({
+  const registros = await getPrisma().caminhao.findMany({
     where,
     select: {
       placa: true,
@@ -88,14 +88,15 @@ export async function listarOpcoesFiltro(): Promise<{
   lotes: string[];
   municipios: string[];
 }> {
+  const db = getPrisma();
   const [lotes, municipios] = await Promise.all([
-    prisma.caminhao.findMany({
+    db.caminhao.findMany({
       where: { NOT: [{ lote: null }, { lote: "" }] },
       distinct: ["lote"],
       select: { lote: true },
       orderBy: { lote: "asc" },
     }),
-    prisma.caminhao.findMany({
+    db.caminhao.findMany({
       where: { NOT: [{ municipio_uf: null }, { municipio_uf: "" }] },
       distinct: ["municipio_uf"],
       select: { municipio_uf: true },
