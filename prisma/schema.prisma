@@ -1,6 +1,10 @@
 // Schema Prisma — Operação Pipa (consulta de placas)
-// Banco: MySQL (tabela `caminhoes` já existente, DDL em src/infra/db/ddl.sql)
-// A URL de conexão fica em prisma.config.ts (padrão Prisma 7).
+// Banco: MySQL/Railway (tabela `caminhoes`, DDL em src/infra/db/ddl.sql)
+// URL de conexão: DATABASE_URL em .env (lida por prisma.config.ts).
+//
+// Nota: a tabela física não tem PK; `placa` é marcada como @unique apenas
+// para satisfazer o Prisma (somente leitura — nunca rodar db push/migrate
+// a partir deste schema sem revisar o banco antes).
 
 datasource db {
   provider = "mysql"
@@ -11,10 +15,10 @@ generator client {
 }
 
 model Caminhao {
-  id            Int    @id @default(autoincrement())
-  placa         String @unique @db.VarChar(7)
-  nome_condutor String @db.VarChar(255)
-  municipio_uf  String @db.VarChar(255)
+  lote          String? @db.VarChar(10)
+  nome_condutor String? @db.VarChar(128)
+  placa         String   @unique @db.VarChar(50)
+  municipio_uf  String? @db.VarChar(50)
 
   @@map("caminhoes")
 }

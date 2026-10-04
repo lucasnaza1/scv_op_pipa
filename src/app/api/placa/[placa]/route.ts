@@ -3,6 +3,9 @@ import { consultarPlaca, normalizarPlaca } from "@/lib/veiculos";
 // Placas brasileiras: 7 caracteres alfanuméricos (padrão antigo e Mercosul).
 const PLACA_VALIDA = /^[A-Z0-9]{7}$/;
 
+// A consulta acontece a cada request (o build nunca deve tocar o banco).
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ placa: string }> }
