@@ -2,6 +2,7 @@ export type Veiculo = {
   placa: string;
   nome_condutor: string;
   municipio_uf: string;
+  lote: string | null;
 };
 
 export type ResultadoConsulta =
@@ -100,6 +101,18 @@ function CardEncontrado({ veiculo }: { veiculo: Veiculo }) {
             {veiculo.municipio_uf}
           </dd>
         </div>
+        {veiculo.lote ? (
+          <div className="flex flex-col gap-0.5">
+            <dt className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+              Lote
+            </dt>
+            <dd className="font-medium text-emerald-950">
+              <span className="inline-flex items-center rounded-lg bg-emerald-700 px-2.5 py-1 text-sm font-bold text-white">
+                {veiculo.lote}
+              </span>
+            </dd>
+          </div>
+        ) : null}
       </dl>
     </article>
   );

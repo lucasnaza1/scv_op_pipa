@@ -4,6 +4,7 @@ import { useCallback, useRef, useState, type FormEvent } from "react";
 import ResultadoConsultaView, {
   type ResultadoConsulta,
 } from "@/components/ResultadoConsulta";
+import MenuGaveta from "@/components/MenuGaveta";
 
 type StatusConsulta = "idle" | "loading";
 
@@ -43,6 +44,7 @@ export default function Home() {
   const [erroFormato, setErroFormato] = useState<string | null>(null);
   const [status, setStatus] = useState<StatusConsulta>("idle");
   const [resultado, setResultado] = useState<ResultadoConsulta | null>(null);
+  const [gavetaAberta, setGavetaAberta] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const consultar = useCallback(async (placaConsulta: string) => {
@@ -55,7 +57,7 @@ export default function Home() {
       if (!resposta.ok) {
         throw new Error(`HTTP ${resposta.status}`);
       }
-      const dados: { encontrado: boolean; veiculo?: { placa: string; nome_condutor: string; municipio_uf: string } } =
+      const dados: { encontrado: boolean; veiculo?: { placa: string; nome_condutor: string; municipio_uf: string; lote: string | null } } =
         await resposta.json();
       if (dados.encontrado && dados.veiculo) {
         setResultado({ status: "encontrado", veiculo: dados.veiculo });
@@ -111,8 +113,29 @@ export default function Home() {
               Operação Pipa
             </p>
           </div>
+          <button
+            type="button"
+            onClick={() => setGavetaAberta(true)}
+            aria-label="Abrir menu de consulta por lote ou município"
+            className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-white/10 transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            <svg
+              className="h-6 w-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+          </button>
         </div>
       </header>
+
+      <MenuGaveta aberto={gavetaAberta} onFechar={() => setGavetaAberta(false)} />
 
       <main className="mx-auto w-full max-w-xl flex-1 px-4 py-8 sm:py-12">
         <section aria-label="Consulta de placa">
